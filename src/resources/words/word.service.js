@@ -8,4 +8,7 @@ const get = async wordId => {
   return word;
 };
 
-module.exports = { getAll, get };
+const getRandom = async (group, num, exclude) =>
+  wordRepo.getRandom(group, num, exclude);
+
+module.exports = { getAll, get, getRandom };
