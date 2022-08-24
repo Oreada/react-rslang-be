@@ -8,12 +8,11 @@ const get = async wordId => {
   return word;
 };
 
-const getRandom = async (group, num, exclude) =>
-  wordRepo.getRandom(group, num, exclude);
+const getRandom = async (group, num) => wordRepo.getRandom(group, num);
 
-const getRandomCards = async (amount, group, num, exclude) => {
+const getRandomCards = async (amount, group, num) => {
   const result = [];
-  let words = await getRandom(group, num * amount, exclude);
+  let words = await getRandom(group, num * amount);
   for (let i = 0; i < amount; i++) {
     const correct = words[0];
     const options = words.slice(1, num);

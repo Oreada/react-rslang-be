@@ -1,5 +1,5 @@
 const Word = require('./word.model');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const { NOT_FOUND_ERROR } = require('../../errors/appErrors');
 const ENTITY_NAME = 'word';
 
@@ -17,13 +17,9 @@ const get = async id => {
   return word;
 };
 
-const getRandom = async (group, num, exclude) => {
-  exclude = exclude.map(item => {
-    return mongoose.Types.ObjectId(item);
-  });
+const getRandom = async (group, num) => {
   const word = Word.aggregate([
     { $match: { group } },
-    { $match: { _id: { $nin: exclude } } },
     { $sample: { size: num } }
   ]);
   return word;

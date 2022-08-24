@@ -25,9 +25,7 @@ router.route('/').get(async (req, res) => {
 router.route('/random').get(async (req, res) => {
   const group = extractQueryParam(req.query.group, 0);
   const num = extractQueryParam(req.query.num, 0);
-  const exclude = req.body.exclude || [];
-
-  const words = await wordService.getRandom(group, num, exclude);
+  const words = await wordService.getRandom(group, num);
   res.status(OK).send(words);
 });
 
@@ -35,8 +33,7 @@ router.route('/random/card/:amount').get(async (req, res) => {
   const group = extractQueryParam(req.query.group, 0);
   const amount = extractQueryParam(req.params.amount, 1);
   const num = extractQueryParam(req.query.num, 0);
-  const exclude = req.body.exclude || [];
-  const result = await wordService.getRandomCards(amount, group, num, exclude);
+  const result = await wordService.getRandomCards(amount, group, num);
   res.status(OK).send(result);
 });
 
