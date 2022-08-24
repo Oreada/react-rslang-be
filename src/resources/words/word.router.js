@@ -31,6 +31,15 @@ router.route('/random').get(async (req, res) => {
   res.status(OK).send(words);
 });
 
+router.route('/random/card/:amount').get(async (req, res) => {
+  const group = extractQueryParam(req.query.group, 0);
+  const amount = extractQueryParam(req.params.amount, 1);
+  const num = extractQueryParam(req.query.num, 0);
+  const exclude = req.body.exclude || [];
+  const result = await wordService.getRandomCards(amount, group, num, exclude);
+  res.status(OK).send(result);
+});
+
 router.route('/:id').get(async (req, res) => {
   const word = await wordService.get(req.params.id);
   res.status(OK).send(word.toResponse());

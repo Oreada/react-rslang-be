@@ -11,4 +11,22 @@ const get = async wordId => {
 const getRandom = async (group, num, exclude) =>
   wordRepo.getRandom(group, num, exclude);
 
-module.exports = { getAll, get, getRandom };
+const getRandomCards = async (amount, group, num, exclude) => {
+  const result = [];
+  let words = await getRandom(group, num * amount, exclude);
+  for (let i = 0; i < amount; i++) {
+    const correct = words[0];
+    const options = words.slice(1, num);
+    result.push({
+      correct,
+      incorrect: options.map(word => {
+        return word.word;
+      })
+    });
+    words = words.slice(num, words.length);
+  }
+
+  return result;
+};
+
+module.exports = { getAll, get, getRandom, getRandomCards };
