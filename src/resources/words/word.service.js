@@ -19,9 +19,7 @@ const getRandomCards = async (amount, group, num, exclude) => {
     const options = words.slice(1, num);
     result.push({
       correct,
-      incorrect: options.map(word => {
-        return word.word;
-      })
+      incorrect: options
     });
     words = words.slice(num, words.length);
   }
