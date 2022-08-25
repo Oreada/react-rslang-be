@@ -2,12 +2,43 @@ const { OK, NO_CONTENT } = require('http-status-codes');
 const router = require('express').Router({ mergeParams: true });
 const { userWord, wordId } = require('../../utils/validation/schemas');
 const { validator } = require('../../utils/validation/validator');
+const extractQueryParam = require('../../utils/getQueryNumberParameter');
 
 const userWordService = require('./userWord.service');
 
 router.get('/', async (req, res) => {
   const userWords = await userWordService.getAll(req.userId);
   res.status(OK).send(userWords.map(w => w.toResponse()));
+});
+
+router.get('/random/', async (req, res) => {
+  const group = extractQueryParam(req.query.group, 0);
+  const num = extractQueryParam(req.query.num, 0);
+  const exclude = req.query.exclude ? req.query.exclude : 'easy';
+
+  const words = await userWordService.getRandom(
+    group,
+    num,
+    exclude,
+    req.userId
+  );
+  res.status(OK).send(words);
+});
+
+router.get('/random/card/:amount', async (req, res) => {
+  const group = extractQueryParam(req.query.group, 0);
+  const amount = extractQueryParam(req.params.amount, 1);
+  const num = extractQueryParam(req.query.num, 0);
+  const exclude = req.query.exclude ? req.query.exclude : 'easy';
+
+  const result = await userWordService.getRandomCards(
+    amount,
+    group,
+    num,
+    exclude,
+    req.userId
+  );
+  res.status(OK).send(result);
 });
 
 router.get('/:wordId', validator(wordId, 'params'), async (req, res) => {

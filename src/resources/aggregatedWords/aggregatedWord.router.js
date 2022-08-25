@@ -30,6 +30,39 @@ router.get('/', async (req, res) => {
   res.status(OK).send(words);
 });
 
+router.get('/:difficulty', async (req, res) => {
+  const perPage = extractQueryParam(req.query.wordsPerPage, 10);
+  const page = extractQueryParam(req.query.page, 0);
+  const group = extractQueryParam(req.query.group);
+
+  if ((req.query.group && isNaN(group)) || isNaN(page) || isNaN(perPage)) {
+    throw new BAD_REQUEST_ERROR(
+      'Wrong query parameters: the group, page and words-per-page numbers should be valid integers'
+    );
+  }
+
+  let filter = null;
+  if (req.params.difficulty === 'hard' || req.params.difficulty === 'easy') {
+    filter = { 'userWord.difficulty': req.params.difficulty };
+  } else if (req.params.difficulty === 'all') {
+    filter = {
+      $or: [
+        { 'userWord.difficulty': 'easy' },
+        { 'userWord.difficulty': 'hard' }
+      ]
+    };
+  }
+
+  const words = await aggregatedWordsService.getAll(
+    req.userId,
+    group,
+    page,
+    perPage,
+    filter
+  );
+  res.status(OK).send(words);
+});
+
 router.get('/:wordId', validator(wordId, 'params'), async (req, res) => {
   const word = await aggregatedWordsService.get(req.params.wordId, req.userId);
 
