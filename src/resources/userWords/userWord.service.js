@@ -4,6 +4,25 @@ const getAll = async userId => wordRepo.getAll(userId);
 
 const get = async (wordId, userId) => wordRepo.get(wordId, userId);
 
+const getRandom = async (group, num, exclude, userId) =>
+  wordRepo.getRandom(group, num, exclude, userId);
+
+const getRandomCards = async (amount, group, num, exclude, userId) => {
+  const result = [];
+  let words = await getRandom(group, num * amount, exclude, userId);
+  for (let i = 0; i < amount; i++) {
+    const correct = words[0];
+    const options = words.slice(1, num);
+    result.push({
+      correct,
+      incorrect: options
+    });
+    words = words.slice(num, words.length);
+  }
+
+  return result;
+};
+
 const save = async (wordId, userId, userWord) =>
   wordRepo.save(wordId, userId, { ...userWord, wordId, userId });
 
@@ -12,4 +31,12 @@ const update = async (wordId, userId, userWord) =>
 
 const remove = async (wordId, userId) => wordRepo.remove(wordId, userId);
 
-module.exports = { getAll, get, save, update, remove };
+module.exports = {
+  getAll,
+  get,
+  save,
+  update,
+  remove,
+  getRandom,
+  getRandomCards
+};

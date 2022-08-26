@@ -1,4 +1,6 @@
 const UserWord = require('./userWord.model');
+const Word = require('../words/word.model');
+const mongoose = require('mongoose');
 const { NOT_FOUND_ERROR, ENTITY_EXISTS } = require('../../errors/appErrors');
 const ENTITY_NAME = 'user word';
 const MONGO_ENTITY_EXISTS_ERROR_CODE = 11000;
@@ -12,6 +14,29 @@ const get = async (wordId, userId) => {
   }
 
   return userWord;
+};
+
+const getRandom = async (group, num, exclude, userId) => {
+  const distinctFilter = { userId: mongoose.Types.ObjectId(userId) };
+  if (exclude === 'easy' || exclude === 'hard') {
+    distinctFilter.difficulty = exclude;
+  }
+  const learnedWords = UserWord.distinct('wordId', distinctFilter);
+  const learnedWordsIds = [];
+  (await learnedWords).forEach(item => {
+    learnedWordsIds.push(mongoose.Types.ObjectId(item));
+  });
+
+  const word = Word.aggregate([
+    {
+      $match: {
+        group
+      }
+    },
+    { $match: { _id: { $nin: learnedWordsIds } } },
+    { $sample: { size: num } }
+  ]);
+  return word;
 };
 
 const save = async (wordId, userId, userWord) => {
@@ -41,4 +66,4 @@ const update = async (wordId, userId, userWord) => {
 
 const remove = async (wordId, userId) => UserWord.deleteOne({ wordId, userId });
 
-module.exports = { getAll, get, save, update, remove };
+module.exports = { getAll, get, save, update, remove, getRandom };
