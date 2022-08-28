@@ -13,11 +13,13 @@ router.get('/', async (req, res) => {
 
 router.get('/random/', async (req, res) => {
   const group = extractQueryParam(req.query.group, 0);
+  const page = extractQueryParam(req.query.page, -1);
   const num = extractQueryParam(req.query.num, 0);
   const exclude = req.query.exclude ? req.query.exclude : 'easy';
 
   const words = await userWordService.getRandom(
     group,
+    page,
     num,
     exclude,
     req.userId
@@ -27,6 +29,7 @@ router.get('/random/', async (req, res) => {
 
 router.get('/random/card/:amount', async (req, res) => {
   const group = extractQueryParam(req.query.group, 0);
+  const page = extractQueryParam(req.query.page, -1);
   const amount = extractQueryParam(req.params.amount, 1);
   const num = extractQueryParam(req.query.num, 0);
   const exclude = req.query.exclude ? req.query.exclude : 'easy';
@@ -34,6 +37,7 @@ router.get('/random/card/:amount', async (req, res) => {
   const result = await userWordService.getRandomCards(
     amount,
     group,
+    page,
     num,
     exclude,
     req.userId

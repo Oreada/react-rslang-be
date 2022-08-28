@@ -16,7 +16,7 @@ const get = async (wordId, userId) => {
   return userWord;
 };
 
-const getRandom = async (group, num, exclude, userId) => {
+const getRandom = async (group, page, num, exclude, userId) => {
   const distinctFilter = { userId: mongoose.Types.ObjectId(userId) };
   if (exclude === 'easy' || exclude === 'hard') {
     distinctFilter.difficulty = exclude;
@@ -27,7 +27,7 @@ const getRandom = async (group, num, exclude, userId) => {
     learnedWordsIds.push(mongoose.Types.ObjectId(item));
   });
 
-  const word = Word.aggregate([
+  const filter = [
     {
       $match: {
         group
@@ -35,7 +35,12 @@ const getRandom = async (group, num, exclude, userId) => {
     },
     { $match: { _id: { $nin: learnedWordsIds } } },
     { $sample: { size: num } }
-  ]);
+  ];
+  if (page >= 0) {
+    filter[0].$match.page = page;
+  }
+
+  const word = Word.aggregate(filter);
   return word;
 };
 
