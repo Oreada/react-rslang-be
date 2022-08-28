@@ -17,11 +17,12 @@ const get = async id => {
   return word;
 };
 
-const getRandom = async (group, num) => {
-  const word = Word.aggregate([
-    { $match: { group } },
-    { $sample: { size: num } }
-  ]);
+const getRandom = async (group, page, num) => {
+  const filter = [{ $match: { group } }, { $sample: { size: num } }];
+  if (page >= 0) {
+    filter[0].$match.page = page;
+  }
+  const word = Word.aggregate(filter);
   return word;
 };
 

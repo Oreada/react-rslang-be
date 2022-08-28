@@ -4,12 +4,12 @@ const getAll = async userId => wordRepo.getAll(userId);
 
 const get = async (wordId, userId) => wordRepo.get(wordId, userId);
 
-const getRandom = async (group, num, exclude, userId) =>
-  wordRepo.getRandom(group, num, exclude, userId);
+const getRandom = async (group, page, num, exclude, userId) =>
+  wordRepo.getRandom(group, page, num, exclude, userId);
 
-const getRandomCards = async (amount, group, num, exclude, userId) => {
+const getRandomCards = async (amount, group, page, num, exclude, userId) => {
   const result = [];
-  let words = await getRandom(group, num * amount, exclude, userId);
+  let words = await getRandom(group, page, num * amount, exclude, userId);
   for (let i = 0; i < amount; i++) {
     const correct = words[0];
     const options = words.slice(1, num);
