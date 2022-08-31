@@ -13,15 +13,27 @@ const getRandom = async (group, page, num) =>
 
 const getRandomCards = async (amount, group, page, num) => {
   const result = [];
-  let words = await getRandom(group, page, num * amount);
-  for (let i = 0; i < amount; i++) {
-    const correct = words[0];
-    const options = words.slice(1, num);
+  let wordsCorrect = await getRandom(group, page, amount);
+  let wordsIncorrect = await getRandom(group, -1, amount * num);
+  const wordsCorrectArray = [];
+  wordsCorrect.forEach(wordCorrect => {
+    wordsCorrectArray.push(wordCorrect._id);
+  });
+
+  wordsIncorrect = wordsIncorrect.filter(word => {
+    return wordsCorrectArray.indexOf(word._id) === -1;
+  });
+
+  const wordsCorrectLength = wordsCorrect.length;
+  for (let i = 0; i < wordsCorrectLength; i++) {
+    const correct = wordsCorrect[0];
+    const options = wordsIncorrect.slice(1, num);
     result.push({
       correct,
       incorrect: options
     });
-    words = words.slice(num, words.length);
+    wordsCorrect = wordsCorrect.slice(1, wordsCorrect.length);
+    wordsIncorrect = wordsIncorrect.slice(num, wordsIncorrect.length);
   }
 
   return result;
