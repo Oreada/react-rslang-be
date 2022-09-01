@@ -9,15 +9,47 @@ const getRandom = async (group, page, num, exclude, userId) =>
 
 const getRandomCards = async (amount, group, page, num, exclude, userId) => {
   const result = [];
-  let words = await getRandom(group, page, num * amount, exclude, userId);
-  for (let i = 0; i < amount; i++) {
-    const correct = words[0];
-    const options = words.slice(1, num);
+  let wordsCorrect = await getRandom(group, page, amount, exclude, userId);
+  let currentPage = page;
+  while (wordsCorrect.length < amount && currentPage > 0) {
+    currentPage -= 1;
+    const wordsCorrectCurrent = await getRandom(
+      group,
+      currentPage,
+      amount,
+      exclude,
+      userId
+    );
+    wordsCorrect = wordsCorrect.concat(wordsCorrectCurrent);
+  }
+  wordsCorrect = wordsCorrect.slice(0, Math.min(amount, wordsCorrect.length));
+
+  let wordsIncorrect = await getRandom(
+    group,
+    -1,
+    amount * num,
+    exclude,
+    userId
+  );
+  const wordsCorrectArray = [];
+  wordsCorrect.forEach(wordCorrect => {
+    wordsCorrectArray.push(wordCorrect._id);
+  });
+
+  wordsIncorrect = wordsIncorrect.filter(word => {
+    return wordsCorrectArray.indexOf(word._id) === -1;
+  });
+
+  const wordsCorrectLength = wordsCorrect.length;
+  for (let i = 0; i < wordsCorrectLength; i++) {
+    const correct = wordsCorrect[0];
+    const options = wordsIncorrect.slice(1, num);
     result.push({
       correct,
       incorrect: options
     });
-    words = words.slice(num, words.length);
+    wordsCorrect = wordsCorrect.slice(1, wordsCorrect.length);
+    wordsIncorrect = wordsIncorrect.slice(num, wordsIncorrect.length);
   }
 
   return result;
